@@ -1,8 +1,4 @@
 {
-    "env": {
-        "es6": true,
-        "node": true
-    },
     "extends": [
         "airbnb-base",
         "prettier/@typescript-eslint",
@@ -15,8 +11,6 @@
     },
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
-        "ecmaVersion": 11,
-        "sourceType": "module",
         "project": "./tsconfig.json",
         "tsconfigRootDir": "./"
     },
