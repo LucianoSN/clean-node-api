@@ -6,7 +6,7 @@
   "license": "MIT",
   "scripts": {
     "test": "jest",
-    "test:staged": "jest",
+    "test:staged": "jest --passWithNoTests",
     "lib:check": "npm-check -s -u"
   },
   "devDependencies": {
