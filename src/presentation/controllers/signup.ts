@@ -1,5 +1,7 @@
+import { HttpRequest, HttpResponse } from '../protocols/http';
+
 class SignUpController {
-    public handle = (args: { httpRequest: any }): any => {
+    public handle = (args: { httpRequest: HttpRequest }): HttpResponse => {
         if (!args.httpRequest.body.name) {
             return {
                 statusCode: 400,
@@ -14,7 +16,7 @@ class SignUpController {
             };
         }
 
-        return {};
+        return undefined;
     };
 }
 
