@@ -1,12 +1,12 @@
 import {
-    HttpRequest,
-    HttpResponse,
     Controller,
     EmailValidator,
+    HttpRequest,
+    HttpResponse,
 } from '../protocols';
 
 import { badRequest, serverError } from '../helpers/http-helper';
-import { MissingParamError, InvalidParamError } from '../erros';
+import { InvalidParamError, MissingParamError } from '../erros';
 
 class SignUpController implements Controller {
     private readonly emailValidator: EmailValidator;
@@ -30,11 +30,19 @@ class SignUpController implements Controller {
                 }
             }
 
-            const emailIsValid = this.emailValidator.isValid({
-                email: args.httpRequest.body.email,
-            });
+            if (
+                !this.passwordConfirmationIsValid({
+                    password: args.httpRequest.body.password,
+                    passwordConfirmation:
+                        args.httpRequest.body.passwordConfirmation,
+                })
+            ) {
+                return badRequest(
+                    new InvalidParamError('passwordConfirmation')
+                );
+            }
 
-            if (!emailIsValid) {
+            if (!this.emailIsValid(args.httpRequest.body.email)) {
                 return badRequest(new InvalidParamError('email'));
             }
 
@@ -42,6 +50,19 @@ class SignUpController implements Controller {
         } catch (error) {
             return serverError();
         }
+    };
+
+    private emailIsValid = (email: string): boolean => {
+        return this.emailValidator.isValid({
+            email,
+        });
+    };
+
+    private passwordConfirmationIsValid = (args: {
+        password: string;
+        passwordConfirmation: string;
+    }): boolean => {
+        return args.password === args.passwordConfirmation;
     };
 }
 
