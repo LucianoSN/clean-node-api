@@ -40,7 +40,7 @@ class SignUpController implements Controller {
             }
 
             if (
-                !this.passwordConfirmationIsValid({
+                !this.confirmationIsValid({
                     password,
                     passwordConfirmation,
                 })
@@ -66,7 +66,7 @@ class SignUpController implements Controller {
         });
     };
 
-    private passwordConfirmationIsValid = (args: {
+    private confirmationIsValid = (args: {
         password: string;
         passwordConfirmation: string;
     }): boolean => {
