@@ -3,6 +3,7 @@ import {
     EmailValidator,
     HttpRequest,
     HttpResponse,
+    HttpSignUpRequest,
 } from '../protocols';
 
 import { badRequest, serverError } from '../helpers/http-helper';
@@ -15,7 +16,9 @@ class SignUpController implements Controller {
         this.emailValidator = emailValidator;
     }
 
-    public handle = (args: { httpRequest: HttpRequest }): HttpResponse => {
+    public handle = (args: {
+        httpRequest: HttpSignUpRequest;
+    }): HttpResponse => {
         try {
             const requiredFields = [
                 'name',
@@ -23,6 +26,12 @@ class SignUpController implements Controller {
                 'password',
                 'passwordConfirmation',
             ];
+
+            const {
+                email,
+                password,
+                passwordConfirmation,
+            } = args.httpRequest.body;
 
             for (const field of requiredFields) {
                 if (!args.httpRequest.body[field]) {
@@ -32,9 +41,8 @@ class SignUpController implements Controller {
 
             if (
                 !this.passwordConfirmationIsValid({
-                    password: args.httpRequest.body.password,
-                    passwordConfirmation:
-                        args.httpRequest.body.passwordConfirmation,
+                    password,
+                    passwordConfirmation,
                 })
             ) {
                 return badRequest(
@@ -42,7 +50,7 @@ class SignUpController implements Controller {
                 );
             }
 
-            if (!this.emailIsValid(args.httpRequest.body.email)) {
+            if (!this.emailIsValid(email)) {
                 return badRequest(new InvalidParamError('email'));
             }
 
