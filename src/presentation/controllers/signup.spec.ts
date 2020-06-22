@@ -28,7 +28,7 @@ describe('SignUp Controller', () => {
     it('should return 400 if no name is provided', async () => {
         const { sut } = makeSut();
 
-        const httpRequest = {
+        const request = {
             body: {
                 email: 'any_email@mail.com',
                 password: 'any_password',
@@ -36,7 +36,7 @@ describe('SignUp Controller', () => {
             },
         };
 
-        const httpResponse = sut.handle({ httpRequest });
+        const httpResponse = sut.handle({ httpRequest: request });
 
         expect(httpResponse.statusCode).toBe(400);
         expect(httpResponse.body).toEqual(new MissingParamError('name'));
@@ -113,5 +113,26 @@ describe('SignUp Controller', () => {
 
         expect(httpResponse.statusCode).toBe(400);
         expect(httpResponse.body).toEqual(new InvalidParamError('email'));
+    });
+
+    it('should call EmailValidator with correct email', async () => {
+        const { sut, emailValidatorStub } = makeSut();
+
+        const isValidSpy = jest.spyOn(emailValidatorStub, 'isValid');
+
+        const request = {
+            body: {
+                name: 'any_name',
+                email: 'any_email@mail.com',
+                password: 'any_password',
+                passwordConfirmation: 'any_password',
+            },
+        };
+
+        sut.handle({ httpRequest: request });
+
+        expect(isValidSpy).toHaveBeenCalledWith({
+            email: 'any_email@mail.com',
+        });
     });
 });
