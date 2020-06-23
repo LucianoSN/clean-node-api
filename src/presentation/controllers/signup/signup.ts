@@ -19,9 +19,9 @@ class SignUpController implements Controller {
         this.addAccount = addAccount;
     }
 
-    public handle = (args: {
+    public handle = async (args: {
         httpRequest: HttpSignUpRequest;
-    }): HttpResponse => {
+    }): Promise<HttpResponse> => {
         try {
             const requiredFields = [
                 'name',
@@ -58,7 +58,11 @@ class SignUpController implements Controller {
                 return badRequest(new InvalidParamError('email'));
             }
 
-            const account = this.addAccount.add({ email, name, password });
+            const account = await this.addAccount.add({
+                email,
+                name,
+                password,
+            });
 
             return success(account);
         } catch (error) {

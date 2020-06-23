@@ -14,14 +14,16 @@ const makeEmailValidator = (): EmailValidator => {
 
 const makeAddAccount = (): AddAccount => {
     class AddAccountStub implements AddAccount {
-        add = (account: Omit<AccountModel, 'id'>): AccountModel => {
-            return {
+        async add(account: Omit<AccountModel, 'id'>): Promise<AccountModel> {
+            const fakeAccount = {
                 id: 'valid_id',
                 name: 'valid_name',
                 email: 'valid_email@mail.com',
                 password: 'valid_password',
             };
-        };
+
+            return new Promise(resolve => resolve(fakeAccount));
+        }
     }
 
     return new AddAccountStub();
@@ -57,7 +59,7 @@ describe('SignUp Controller', () => {
             },
         };
 
-        const httpResponse = sut.handle({ httpRequest: request });
+        const httpResponse = await sut.handle({ httpRequest: request });
 
         expect(httpResponse.statusCode).toBe(400);
         expect(httpResponse.body).toEqual(new MissingParamError('name'));
@@ -74,7 +76,7 @@ describe('SignUp Controller', () => {
             },
         };
 
-        const httpResponse = sut.handle({ httpRequest: request });
+        const httpResponse = await sut.handle({ httpRequest: request });
 
         expect(httpResponse.statusCode).toBe(400);
         expect(httpResponse.body).toEqual(new MissingParamError('email'));
@@ -91,7 +93,7 @@ describe('SignUp Controller', () => {
             },
         };
 
-        const httpResponse = sut.handle({ httpRequest: request });
+        const httpResponse = await sut.handle({ httpRequest: request });
 
         expect(httpResponse.statusCode).toBe(400);
         expect(httpResponse.body).toEqual(new MissingParamError('password'));
@@ -108,7 +110,7 @@ describe('SignUp Controller', () => {
             },
         };
 
-        const httpResponse = sut.handle({ httpRequest: request });
+        const httpResponse = await sut.handle({ httpRequest: request });
 
         expect(httpResponse.statusCode).toBe(400);
         expect(httpResponse.body).toEqual(
@@ -128,7 +130,7 @@ describe('SignUp Controller', () => {
             },
         };
 
-        const httpResponse = sut.handle({ httpRequest: request });
+        const httpResponse = await sut.handle({ httpRequest: request });
 
         expect(httpResponse.statusCode).toBe(400);
         expect(httpResponse.body).toEqual(
@@ -150,7 +152,7 @@ describe('SignUp Controller', () => {
             },
         };
 
-        const httpResponse = sut.handle({ httpRequest: request });
+        const httpResponse = await sut.handle({ httpRequest: request });
 
         expect(httpResponse.statusCode).toBe(400);
         expect(httpResponse.body).toEqual(new InvalidParamError('email'));
@@ -170,7 +172,7 @@ describe('SignUp Controller', () => {
             },
         };
 
-        sut.handle({ httpRequest: request });
+        await sut.handle({ httpRequest: request });
 
         expect(isValidSpy).toHaveBeenCalledWith({
             email: 'any_email@mail.com',
@@ -193,7 +195,7 @@ describe('SignUp Controller', () => {
             },
         };
 
-        const httpResponse = sut.handle({ httpRequest: request });
+        const httpResponse = await sut.handle({ httpRequest: request });
 
         expect(httpResponse.statusCode).toBe(500);
         expect(httpResponse.body).toEqual(new ServerError());
@@ -213,7 +215,7 @@ describe('SignUp Controller', () => {
             },
         };
 
-        sut.handle({ httpRequest: request });
+        await sut.handle({ httpRequest: request });
 
         expect(addSpy).toHaveBeenCalledWith({
             name: 'any_name',
@@ -225,8 +227,8 @@ describe('SignUp Controller', () => {
     it('should return 500 if AddAccount throws', async () => {
         const { sut, addAccountStub } = makeSut();
 
-        jest.spyOn(addAccountStub, 'add').mockImplementationOnce(() => {
-            throw new Error();
+        jest.spyOn(addAccountStub, 'add').mockImplementationOnce(async () => {
+            return new Promise((resolve, reject) => reject(new Error()));
         });
 
         const request = {
@@ -238,7 +240,7 @@ describe('SignUp Controller', () => {
             },
         };
 
-        const httpResponse = sut.handle({ httpRequest: request });
+        const httpResponse = await sut.handle({ httpRequest: request });
 
         expect(httpResponse.statusCode).toBe(500);
         expect(httpResponse.body).toEqual(new ServerError());
@@ -256,7 +258,7 @@ describe('SignUp Controller', () => {
             },
         };
 
-        const httpResponse = sut.handle({ httpRequest: request });
+        const httpResponse = await sut.handle({ httpRequest: request });
 
         expect(httpResponse.statusCode).toBe(200);
         expect(httpResponse.body).toEqual({
