@@ -9,6 +9,7 @@ export interface HttpRequest {
 
 export interface HttpSignUpRequest {
     body: {
+        name?: string;
         email?: string;
         password?: string;
         passwordConfirmation?: string;
