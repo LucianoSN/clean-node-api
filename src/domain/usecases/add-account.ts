@@ -1,5 +1,5 @@
 import { AccountModel } from '../models/account';
 
 export interface AddAccount {
-    add(account: Omit<AccountModel, 'id'>): Promise<AccountModel>;
+    add(accountData: Omit<AccountModel, 'id'>): Promise<AccountModel>;
 }
